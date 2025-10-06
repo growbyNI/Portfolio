@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reelio - Launch Screen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .launch-screen {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-container {
+            text-align: center;
+            z-index: 10;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 5rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+            position: relative;
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: logoReveal 1.2s ease-out 0.5s forwards;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 10%;
+            width: 80%;
+            height: 5px;
+            background: white;
+            border-radius: 10px;
+            transform: scaleX(0);
+            transform-origin: center;
+            animation: expandLine 1.5s ease 1.5s forwards;
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s ease 2s forwards;
+        }
+
+        .loader {
+            width: 80px;
+            height: 80px;
+            position: relative;
+            margin-top: 40px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 2.5s forwards;
+        }
+
+        .loader-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid transparent;
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .loader-circle:nth-child(2) {
+            border: 4px solid transparent;
+            border-bottom: 4px solid white;
+            animation: spinReverse 1.5s linear infinite;
+        }
+
+        .floating-elements {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .floating-element {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+
+        .video-preview {
+            position: absolute;
+            width: 300px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            transform: scale(0.8);
+            z-index: 5;
+        }
+
+        .video-preview.left {
+            left: 10%;
+            top: 20%;
+            animation: slideInLeft 1s ease 3s forwards;
+        }
+
+        .video-preview.right {
+            right: 10%;
+            bottom: 20%;
+            animation: slideInRight 1s ease 3.2s forwards;
+        }
+
+        .video-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        .video-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #fdbb2d, #b21f1f);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        .video-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .progress-container {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: white;
+            border-radius: 2px;
+            animation: progress 15s linear 3.5s forwards;
+        }
+
+        .launch-complete {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s ease;
+        }
+
+        .launch-complete.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .welcome-message {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .welcome-message.active {
+            animation: fadeInUp 1s ease forwards;
+        }
+
+        .get-started-btn {
+            padding: 15px 40px;
+            background: white;
+            color: #1a2a6c;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .get-started-btn.active {
+            animation: fadeInUp 1s ease 0.5s forwards;
+        }
+
+        .get-started-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes logoReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes expandLine {
+            from { transform: scaleX(0); }
+            to { transform: scaleX(1); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes spinReverse {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-1000px) rotate(720deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-100px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        @keyframes progress {
+            from { width: 0%; }
+            to { width: 100%; }
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 3.5rem;
+            }
+            
+            .tagline {
+                font-size: 1.2rem;
+            }
+            
+            .video-preview {
+                width: 200px;
+                height: 350px;
+            }
+            
+            .video-preview.left {
+                left: 5%;
+            }
+            
+            .video-preview.right {
+                right: 5%;
+            }
+            
+            .welcome-message {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="launch-screen">
+        <div class="floating-elements" id="floatingContainer"></div>
+        
+        <div class="logo-container">
+            <h1 class="logo">REELIO</h1>
+            <p class="tagline">Your Stories, Your World</p>
+            
+            <div style="margin-left: auto; margin-right: auto; top: 80px;" class="loader">
+                <div class="loader-circle"></div>
+                <div class="loader-circle"></div>
+            </div>
+        </div>
+        
+        <div class="video-preview left">
+            <div class="video-content">
+                <div class="video-header">
+                    <div class="user-info">
+                        <div class="avatar">JS</div>
+                        <span>@janesmith</span>
+                    </div>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                
+                <div class="video-footer">
+                    <div class="action-buttons">
+                        <div class="action-btn">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fas fa-share"></i>
+                        </div>
+                    </div>
+                    <i class="fas fa-music"></i>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="video-preview right">
+            <div class="video-content">
+                <div class="video-header">
+                    <div class="user-info">
+                        <div class="avatar">MD</div>
+                        <span>@miked</span>
+                    </div>
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                
+                <div class="video-footer">
+                    <div class="action-buttons">
+                        <div class="action-btn">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fas fa-comment"></i>
+                        </div>
+                        <div class="action-btn">
+                            <i class="fas fa-share"></i>
+                        </div>
+                    </div>
+                    <i class="fas fa-music"></i>
+                </div>
+              
+                <div style="display: flex;" class="progress-container">
+                    <div  class="progress-bar"></div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <div class="launch-complete" id="launchComplete">
+            <h2 class="welcome-message">Welcome to Reelio</h2>
+            <p class="tagline">Ready to share your story?</p>
+            <button class="get-started-btn" id="getStartedBtn">Get Started</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create floating elements
+            const floatingContainer = document.getElementById('floatingContainer');
+            for (let i = 0; i < 12; i++) {
+                const element = document.createElement('div');
+                element.classList.add('floating-element');
+                
+                // Random size and position
+                const size = Math.random() * 100 + 30;
+                element.style.width = `${size}px`;
+                element.style.height = `${size}px`;
+                element.style.left = `${Math.random() * 100}%`;
+                element.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation delay and duration
+                element.style.animationDelay = `-${Math.random() * 10}s`;
+                element.style.animationDuration = `${15 + Math.random() * 10}s`;
+                
+                floatingContainer.appendChild(element);
+            }
+            
+            // Simulate app loading process
+            setTimeout(() => {
+                const launchComplete = document.getElementById('launchComplete');
+                const welcomeMessage = document.querySelector('.welcome-message');
+                const getStartedBtn = document.getElementById('getStartedBtn');
+                
+                launchComplete.classList.add('active');
+                welcomeMessage.classList.add('active');
+                getStartedBtn.classList.add('active');
+            }, 8000); // Show welcome screen after 8 seconds
+            
+            // Get Started button functionality
+            document.getElementById('getStartedBtn').addEventListener('click', function() {
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                this.style.transform = 'scale(0.95)';
+                 window.location.href = "index.html";
+                
+                setTimeout(() => {
+                    alert('App would now transition to the main interface');
+                    // In a real app, you would redirect to the main app screen here
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+</html>
